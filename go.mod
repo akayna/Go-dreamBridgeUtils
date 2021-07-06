@@ -1,4 +1,4 @@
-module github.com/akayna/dreamBridge/Utils
+module github.com/akayna/dreamBridgeUtils
 
 go 1.16
 
