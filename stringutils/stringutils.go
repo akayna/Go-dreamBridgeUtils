@@ -4,7 +4,9 @@ import (
 	"errors"
 	"fmt"
 	"log"
+	"math/rand"
 	"strings"
+	"time"
 
 	"golang.org/x/crypto/bcrypt"
 )
@@ -59,4 +61,17 @@ func SeparaNomeSobrenome(nomeCompleto string) (string, string, error) {
 	}
 
 	return nome, sobrenome, nil
+}
+
+func GeraStringAleatoria(tamanho int) string {
+	rand.Seed(time.Now().UnixNano())
+
+	//const letters = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789"
+	const letters = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789"
+
+	b := make([]byte, tamanho)
+	for i := range b {
+		b[i] = letters[rand.Intn(len(letters))]
+	}
+	return string(b)
 }
