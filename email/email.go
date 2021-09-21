@@ -7,10 +7,7 @@ import (
 	"log"
 
 	"golang.org/x/oauth2/google"
-
-	gmail "google.golang.org/api/gmail/v1"
-
-	gmailDB "github.com/rafaelcunha/Go-dreambridgeUtils/email/gmail"
+	"google.golang.org/api/gmail/v1"
 )
 
 func (email *Email) montaMensagemEmailTexto() ([]byte, error) {
@@ -95,7 +92,7 @@ func (email *Email) EnviaEmail() error {
 		return err
 	}
 
-	srv, err := gmail.New(gmailDB.GetClient(config))
+	srv, err := gmail.New(gmaildb.GetClient(config))
 	if err != nil {
 		log.Println("email.Email.EnviaEmail - Unable to retrieve Gmail client.")
 		return err

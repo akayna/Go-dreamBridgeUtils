@@ -1,1 +1,1 @@
-package gmail
+package gmaildb

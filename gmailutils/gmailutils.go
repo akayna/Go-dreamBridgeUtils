@@ -13,6 +13,7 @@ import (
 	"golang.org/x/net/context"
 	"golang.org/x/oauth2"
 	"golang.org/x/oauth2/google"
+
 	gmail "google.golang.org/api/gmail/v1"
 )
 
@@ -53,7 +54,7 @@ func montaMensagemEmailTexto(email *EmailTexto) ([]byte, error) {
 				messageStr += ","
 			}
 		}
-	
+
 		messageStr += "\r\n"
 	}
 

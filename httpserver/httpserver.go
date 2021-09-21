@@ -1,6 +1,14 @@
 package main
 
 import (
+	"Go-dreamBridgeCybersource/jwt"
+	"Go-dreamBridgeCybersource/rest/commons"
+	"Go-dreamBridgeCybersource/rest/flexAPI"
+	"Go-dreamBridgeCybersource/rest/gtw"
+	"Go-dreamBridgeCybersource/rest/threeds"
+	"Go-dreamBridgeCybersource/rest/tms"
+	"Go-dreamBridgeUtils/jsonfile"
+	"Go-dreamBridgeUtils/timeutils"
 	"context"
 	"encoding/json"
 	"flag"
@@ -14,15 +22,6 @@ import (
 	"sync/atomic"
 	"syscall"
 	"time"
-
-	"github.com/rafaelcunha/Go-CyberSource/cybersource3ds"
-	"github.com/rafaelcunha/Go-CyberSource/cybersourcecommons"
-	"github.com/rafaelcunha/Go-CyberSource/cybersourceflex"
-	"github.com/rafaelcunha/Go-CyberSource/cybersourcegateway"
-	"github.com/rafaelcunha/Go-CyberSource/cybersourcejwt"
-	"github.com/rafaelcunha/Go-CyberSource/cybersourcetms"
-	"github.com/rafaelcunha/Go-dreambridgeUtils/jsonfile"
-	"github.com/rafaelcunha/Go-dreambridgeUtils/timeutils"
 )
 
 type middleware func(http.Handler) http.Handler
@@ -68,7 +67,7 @@ type controller struct {
 	healthy       int64
 }
 
-var credentials cybersourcecommons.Credentials
+var credentials commons.Credentials
 
 func main() {
 	// Carrega credenciais
@@ -202,7 +201,7 @@ func getMicroformJWTKey(w http.ResponseWriter, req *http.Request) {
 
 	targetorigin = targetorigin + req.Host
 
-	response, responseMessage, err := cybersourceflex.GenerateMicroformKey(&credentials.CyberSourceCredential, targetorigin)
+	response, responseMessage, err := flexAPI.GenerateMicroformKey(&credentials.CyberSourceCredential, targetorigin)
 	if err != nil {
 		log.Println("main - getMicroformJWTKey - Erro ao gerar JWT para o microform.")
 		return
@@ -223,7 +222,7 @@ func getMicroformJWTKey(w http.ResponseWriter, req *http.Request) {
 }
 
 func getKey(w http.ResponseWriter, req *http.Request) {
-	generatedKey, msg, err := cybersourceflex.GenerateKey(&credentials.CyberSourceCredential, nil)
+	generatedKey, msg, err := flexAPI.GenerateKey(&credentials.CyberSourceCredential, nil)
 
 	if err != nil {
 		log.Println("main - Error generating key.")
@@ -260,7 +259,7 @@ func getJWT(w http.ResponseWriter, req *http.Request) {
 
 	payload.OrderDetails.OrderNumber = orderNumber
 
-	jwtClaims := cybersourcejwt.Claims{
+	jwtClaims := jwt.Claims{
 		CardinalCredentials: &credentials.CardinalCredential,
 		ReferenceID:         payload.OrderDetails.OrderNumber,
 		Payload:             payload,
@@ -291,7 +290,7 @@ func getJWT(w http.ResponseWriter, req *http.Request) {
 func doEnrollment(w http.ResponseWriter, req *http.Request) {
 	log.Println("doEnrollment")
 
-	var enrollmentData cybersource3ds.EnrollmentRequestData
+	var enrollmentData threeds.EnrollmentRequestData
 
 	err := json.NewDecoder(req.Body).Decode(&enrollmentData)
 	if err != nil {
@@ -305,7 +304,7 @@ func doEnrollment(w http.ResponseWriter, req *http.Request) {
 	if enrollmentData.PaymentInformation.Customer != nil {
 		log.Println("Teste de Token retrieval")
 
-		PaymentInstrumentResponse, returnMsg, err := cybersourcetms.RetrievePaymentInstrument(&credentials.CyberSourceCredential, *enrollmentData.PaymentInformation.Customer.CustomerID)
+		PaymentInstrumentResponse, returnMsg, err := tms.RetrievePaymentInstrument(&credentials.CyberSourceCredential, *enrollmentData.PaymentInformation.Customer.CustomerID)
 
 		log.Println("Token retrieve teste message: " + returnMsg)
 
@@ -319,7 +318,7 @@ func doEnrollment(w http.ResponseWriter, req *http.Request) {
 	var mcc = "5399"
 	var messageCategory = "01"
 	var productCode = "01"
-	var transactionMode = cybersource3ds.TransactionModeECOMMERCE
+	var transactionMode = threeds.TransactionModeECOMMERCE
 	var acsWindowSize = "05"
 	//var requestorID = "CARDCYBS_5b16ebc085282c2b20313e7b"
 	//var requestorName = "Braspag"
@@ -336,8 +335,8 @@ func doEnrollment(w http.ResponseWriter, req *http.Request) {
 	//var merchantName = "Brazil Test"
 	//var merchantURL = "https://merchantrul.com"
 
-	//MerchantInformationData := new(cybersource3ds.MerchantInformation)
-	//MerchantDescriptorData := new(cybersource3ds.MerchantDescriptor)
+	//MerchantInformationData := new(threeds.MerchantInformation)
+	//MerchantDescriptorData := new(threeds.MerchantDescriptor)
 
 	//MerchantInformationData.MerchantName = &merchantName
 	//MerchantDescriptorData.Name = &merchantName
@@ -349,7 +348,7 @@ func doEnrollment(w http.ResponseWriter, req *http.Request) {
 	log.Println("Paymenta data:")
 	log.Printf("%+v\n", enrollmentData)
 
-	enrollmentResponse, returnString, err := cybersource3ds.EnrollmentRequest(&credentials.CyberSourceCredential, &enrollmentData)
+	enrollmentResponse, returnString, err := threeds.EnrollmentRequest(&credentials.CyberSourceCredential, &enrollmentData)
 
 	if err != nil || enrollmentResponse == nil {
 		log.Println("doEnrollment - Error during enrollment request: " + returnString)
@@ -375,16 +374,16 @@ func doEnrollment(w http.ResponseWriter, req *http.Request) {
 func doValidate(w http.ResponseWriter, req *http.Request) {
 	log.Println("doValidate")
 
-	var jwt string
+	var jwtString string
 
-	err := json.NewDecoder(req.Body).Decode(&jwt)
+	err := json.NewDecoder(req.Body).Decode(&jwtString)
 	if err != nil {
 		log.Println("doValidate - Error converting json to struct: ", err)
 		http.Error(w, "doValidate - Error converting json to struct.", http.StatusBadRequest)
 		return
 	}
 
-	claims := cybersourcejwt.ValidateReadJWT(jwt, credentials.CardinalCredential.APIKeyID)
+	claims := jwt.ValidateReadJWT(jwtString, credentials.CardinalCredential.APIKeyID)
 
 	if claims == nil {
 		log.Printf("doValidate - JWT error.")
@@ -409,13 +408,13 @@ func doValidate(w http.ResponseWriter, req *http.Request) {
 
 	authenticationTransactionID := payment["ProcessorTransactionId"].(string)
 
-	validationRequestData := cybersource3ds.ValidationRequestData{
-		ConsumerAuthenticationInformation: &cybersourcecommons.ConsumerAuthenticationInformation{
+	validationRequestData := threeds.ValidationRequestData{
+		ConsumerAuthenticationInformation: &commons.ConsumerAuthenticationInformation{
 			AuthenticationTransactionID: &authenticationTransactionID,
 		},
 	}
 
-	validationResponse, returnString, err := cybersource3ds.ValidationtRequest(&credentials.CyberSourceCredential, &validationRequestData)
+	validationResponse, returnString, err := threeds.ValidationtRequest(&credentials.CyberSourceCredential, &validationRequestData)
 
 	if err != nil || validationResponse == nil {
 		log.Println("doValidate - Error during validation request: " + returnString)
@@ -445,7 +444,7 @@ func vcoReceiveData(w http.ResponseWriter, req *http.Request) {
 func doAuthorize(w http.ResponseWriter, req *http.Request) {
 	log.Println("doAuthorize")
 
-	var paymentData cybersourcegateway.Payment
+	var paymentData gtw.Payment
 
 	err := json.NewDecoder(req.Body).Decode(&paymentData)
 	if err != nil {
@@ -465,7 +464,7 @@ func doAuthorize(w http.ResponseWriter, req *http.Request) {
 	log.Println("Paymenta data:")
 	log.Println(string(paymentDataJSON))
 
-	auhorizationResponse, responseString, err := cybersourcegateway.ProcessPayment(&credentials.CyberSourceCredential, &paymentData)
+	auhorizationResponse, responseString, err := gtw.ProcessPayment(&credentials.CyberSourceCredential, &paymentData)
 
 	if err != nil {
 		log.Println("doAuthorize - Error authorizing payment.")

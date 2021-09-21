@@ -1,4 +1,4 @@
-package gmail
+package gmaildb
 
 import (
 	"encoding/json"
@@ -8,7 +8,6 @@ import (
 	"os"
 
 	"golang.org/x/net/context"
-
 	"golang.org/x/oauth2"
 )
 
