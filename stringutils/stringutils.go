@@ -75,3 +75,35 @@ func GeraStringAleatoria(tamanho int) string {
 	}
 	return string(b)
 }
+
+// MapToString - Generate one string with key and value from a map[string][]string
+func MapToString(mapVariable *map[string][]string) string {
+
+	var mapString string
+
+	if mapVariable != nil {
+		// Loop over trailer names
+		for name, values := range *mapVariable {
+			mapString += name + ": " + VectorStringToStringLine(values)
+			mapString += "\n"
+		}
+	}
+	return mapString
+}
+
+// VectorStringToStringLine - Create one string with one line of all strings from a string vector separated with ","
+func VectorStringToStringLine(vectorString []string) string {
+	var stringLine string
+
+	// Loop over all values for the name.
+	for index, value := range vectorString {
+
+		stringLine += value
+
+		if index < (len(vectorString) - 1) {
+			stringLine += ", "
+		}
+	}
+
+	return stringLine
+}
