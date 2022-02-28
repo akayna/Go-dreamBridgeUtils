@@ -8,6 +8,33 @@ import (
 	"github.com/akayna/Go-dreamBridgeUtils/stringutils"
 )
 
+//AddCcoRecipient - Add a Cco recipient
+func (email *TextEmail) AddCcoRecipient(newRecipient string) {
+	if len(email.Cco) > 0 {
+		email.Cco = append(email.Cco, ", ")
+	}
+
+	email.Cco = append(email.Cco, newRecipient)
+}
+
+//method - Add a Co recipient
+func (email *TextEmail) AddCoRecipient(newRecipient string) {
+	if len(email.Co) > 0 {
+		email.Co = append(email.Co, ", ")
+	}
+
+	email.Co = append(email.Co, newRecipient)
+}
+
+//AddToRecipient - Add a To recipient
+func (email *TextEmail) AddToRecipient(newRecipient string) {
+	if len(email.To) > 0 {
+		email.To = append(email.To, ", ")
+	}
+
+	email.To = append(email.To, newRecipient)
+}
+
 func (email *TextEmail) montaMensagemEmailTexto() ([]byte, error) {
 	var messageStr string
 

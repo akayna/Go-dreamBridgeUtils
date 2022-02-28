@@ -1,9 +1,5 @@
 package emailutils
 
-const emailQueueMaxSize = 200
-
-var textEmailQueue []TextEmail
-
 // Email - Struct to send text email
 type TextEmail struct {
 	From     string   `json:"from"`

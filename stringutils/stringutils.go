@@ -28,8 +28,8 @@ func CriptografaString(senha string, cost int) (string, error) {
 	return string(bytes), err
 }
 
-// checkStringHash - Verifica se a criptografia corresponde à string passada
-func checkStringHash(str, hash string) (bool, error) {
+// CheckStringHash - Verifica se a criptografia corresponde à string passada
+func CheckStringHash(str, hash string) (bool, error) {
 	err := bcrypt.CompareHashAndPassword([]byte(hash), []byte(str))
 
 	if err != nil {
@@ -57,7 +57,7 @@ func SeparaNomeSobrenome(nomeCompleto string) (string, string, error) {
 		return nome, sobrenome, errors.New("stringutils.SeparaNomeSobrenome - Existe um espeço na primeira letra? A string está vazia?")
 	} else {
 		nome = nomeCompleto[0:i]
-		sobrenome = nomeCompleto[(i + 1):len(nomeCompleto)]
+		sobrenome = nomeCompleto[(i + 1):]
 	}
 
 	return nome, sobrenome, nil
