@@ -20,10 +20,3 @@ func (block *Block) Clean() interface{} {
 
 	return data
 }
-
-// NewQueue - Create a new queue
-func NewQueue() *Queue {
-	newQueue := new(Queue)
-
-	return newQueue
-}
