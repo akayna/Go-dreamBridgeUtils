@@ -108,6 +108,10 @@ func (roundQueue *RoundQueue) RemoveBlock() *queueutils.Block {
 
 	roundQueue.actualSize--
 
+	if roundQueue.IsEmpty() {
+		roundQueue.pointer = nil
+	}
+
 	return removedBlock
 }
 

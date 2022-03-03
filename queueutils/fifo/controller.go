@@ -35,3 +35,13 @@ func (fifo *Fifo) RemoveBlock() *queueutils.Block {
 func (fifo *Fifo) IsEmpty() bool {
 	return fifo.queue.IsEmpty()
 }
+
+// IsFull - return true if the fifo is empty
+func (fifo *Fifo) IsFull() bool {
+	return fifo.queue.IsFull()
+}
+
+// ActualSize - Return the fifo actual size
+func (fifo *Fifo) ActualSize() int {
+	return fifo.queue.ActualSize()
+}
