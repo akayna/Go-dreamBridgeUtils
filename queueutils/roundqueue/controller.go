@@ -46,14 +46,14 @@ func (roundQueue *RoundQueue) AddNextBlock(newBlock *queueutils.Block) error {
 
 	if roundQueue.pointer == nil {
 		roundQueue.pointer = newBlock
-		roundQueue.pointer.NextBlock = newBlock
-		roundQueue.pointer.PreviousBlock = newBlock
+		roundQueue.pointer.SetNextBlock(newBlock)
+		roundQueue.pointer.SetPreviousBlock(newBlock)
 	} else {
-		newBlock.PreviousBlock = roundQueue.pointer
-		newBlock.NextBlock = roundQueue.pointer.NextBlock
+		newBlock.SetPreviousBlock(roundQueue.pointer)
+		newBlock.SetNextBlock(roundQueue.pointer.GetNextBlock())
 
-		roundQueue.pointer.NextBlock.PreviousBlock = newBlock
-		roundQueue.pointer.NextBlock = newBlock
+		roundQueue.pointer.GetNextBlock().SetPreviousBlock(newBlock)
+		roundQueue.pointer.SetNextBlock(newBlock)
 	}
 
 	roundQueue.actualSize++
@@ -72,14 +72,14 @@ func (roundQueue *RoundQueue) AddPreviousBlock(newBlock *queueutils.Block) error
 
 	if roundQueue.pointer == nil {
 		roundQueue.pointer = newBlock
-		roundQueue.pointer.NextBlock = newBlock
-		roundQueue.pointer.PreviousBlock = newBlock
+		roundQueue.pointer.SetNextBlock(newBlock)
+		roundQueue.pointer.SetPreviousBlock(newBlock)
 	} else {
-		newBlock.PreviousBlock = roundQueue.pointer.PreviousBlock
-		newBlock.NextBlock = roundQueue.pointer
+		newBlock.SetPreviousBlock(roundQueue.pointer.GetPreviousBlock())
+		newBlock.SetNextBlock(roundQueue.pointer)
 
-		roundQueue.pointer.PreviousBlock.NextBlock = newBlock
-		roundQueue.pointer.PreviousBlock = newBlock
+		roundQueue.pointer.GetPreviousBlock().SetNextBlock(newBlock)
+		roundQueue.pointer.SetPreviousBlock(newBlock)
 	}
 
 	roundQueue.actualSize++
@@ -98,13 +98,13 @@ func (roundQueue *RoundQueue) RemoveBlock() *queueutils.Block {
 
 	removedBlock := roundQueue.pointer
 
-	roundQueue.pointer.PreviousBlock.NextBlock = roundQueue.pointer.NextBlock
-	roundQueue.pointer.NextBlock.PreviousBlock = roundQueue.pointer.PreviousBlock
+	roundQueue.pointer.GetPreviousBlock().SetNextBlock(roundQueue.pointer.GetNextBlock())
+	roundQueue.pointer.GetNextBlock().SetPreviousBlock(roundQueue.pointer.GetPreviousBlock())
 
-	roundQueue.pointer = roundQueue.pointer.NextBlock
+	roundQueue.pointer = roundQueue.pointer.GetNextBlock()
 
-	removedBlock.NextBlock = nil
-	removedBlock.PreviousBlock = nil
+	removedBlock.SetNextBlock(nil)
+	removedBlock.SetPreviousBlock(nil)
 
 	roundQueue.actualSize--
 
@@ -121,7 +121,7 @@ func (roundQueue *RoundQueue) MovePointerToNext() {
 		return
 	}
 
-	roundQueue.pointer = roundQueue.pointer.NextBlock
+	roundQueue.pointer = roundQueue.pointer.GetNextBlock()
 }
 
 // MovePointerToPrevious - Move the pointer to the previous block
@@ -130,7 +130,7 @@ func (roundQueue *RoundQueue) MovePointerToPrevious() {
 		return
 	}
 
-	roundQueue.pointer = roundQueue.pointer.PreviousBlock
+	roundQueue.pointer = roundQueue.pointer.GetPreviousBlock()
 }
 
 // GetPointerData - Returns the data stored in the block pointed by the pointer
@@ -138,7 +138,7 @@ func (roundQueue *RoundQueue) GetPointerData() interface{} {
 	if roundQueue.pointer == nil {
 		return nil
 	}
-	return roundQueue.pointer.Data
+	return roundQueue.pointer.GetData()
 }
 
 // SetPointerData - Sets the data of the block pointed by the pointer
@@ -150,7 +150,7 @@ func (roundQueue *RoundQueue) SetPointerData(data interface{}) error {
 		return errors.New("roundqueue.SetPointerData - The queue is empty")
 	}
 
-	roundQueue.pointer.Data = data
+	roundQueue.pointer.SetData(data)
 
 	return nil
 }

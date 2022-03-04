@@ -1,7 +1,10 @@
 package queueutils
 
+import "sync"
+
 type Block struct {
-	NextBlock     *Block
-	PreviousBlock *Block
-	Data          interface{}
+	mu            sync.Mutex
+	nextBlock     *Block
+	previousBlock *Block
+	data          interface{}
 }
