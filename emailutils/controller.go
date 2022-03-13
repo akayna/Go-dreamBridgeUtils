@@ -39,7 +39,7 @@ func (email *TextEmail) montaMensagemEmailTexto() ([]byte, error) {
 	var messageStr string
 
 	if len(email.From) > 0 {
-		messageStr += "From: " + email.From + "\r\n"
+		messageStr = "From: " + email.From + "\r\n"
 	}
 
 	if len(email.To) <= 0 {
@@ -78,6 +78,8 @@ func (email *TextEmail) EnviaEmailSMTP() error {
 		log.Println("email.Email.EnviaEmail - falha ao montar mensagem.")
 		return err
 	}
+
+	log.Println("Email: \n\r", string(messageStr))
 
 	err = smtp.SendMail("smtp.gmail.com:587",
 		smtp.PlainAuth("", email.From, email.Password, "smtp.gmail.com"),
