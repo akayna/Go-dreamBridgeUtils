@@ -8,16 +8,15 @@ import (
 	"golang.org/x/text/encoding/unicode"
 )
 
-// GenerateDigest - Return the digest SHA-256 hashing
-func GenerateDigest(data string) (string, error) {
+// GenerateDigestSHA256 - Return the digest SHA-256 hashing in base64
+func GenerateDigestSHA256(data string) (string, error) {
 
 	decoder := unicode.UTF8.NewDecoder()
 
 	dataUTF8, err := decoder.Bytes([]byte(data))
 
 	if err != nil {
-		log.Println("digest - GenerateDigest: Error converting string to UTF8 char array.")
-		log.Println(err)
+		log.Println("digest.GenerateDigestSHA256: Error converting string to UTF8 char array.")
 		return "", err
 	}
 
