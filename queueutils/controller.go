@@ -1,10 +1,14 @@
 package queueutils
 
+var blockIdCounter = uint(1)
+
 // NewBlock - Create or recover a new block
 func NewBlock(data interface{}) *Block {
 	newBlock := new(Block)
 
 	newBlock.data = data
+	newBlock.id = blockIdCounter
+	blockIdCounter++
 
 	return newBlock
 }
@@ -69,4 +73,12 @@ func (block *Block) GetNextBlock() *Block {
 	defer block.mu.Unlock()
 
 	return block.nextBlock
+}
+
+// GetId - Returns the block ID
+func (block *Block) GetId() uint {
+	block.mu.Lock()
+	defer block.mu.Unlock()
+
+	return block.id
 }

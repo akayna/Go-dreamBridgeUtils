@@ -1,6 +1,7 @@
 package stringutils
 
 import (
+	"encoding/base64"
 	"errors"
 	"fmt"
 	"log"
@@ -106,4 +107,19 @@ func VectorStringToStringLine(vectorString []string) string {
 	}
 
 	return stringLine
+}
+
+// Base64Decode - Decode from base64
+func Base64Decode(str string) (string, error) {
+	data, err := base64.StdEncoding.DecodeString(str)
+	if err != nil {
+		log.Println("stringutils - Base64Decode - Error decoding from base64.")
+		return "", err
+	}
+	return string(data), nil
+}
+
+// Base64Encode - Encode string to base64
+func Base64Encode(str string) string {
+	return base64.StdEncoding.EncodeToString([]byte(str))
 }

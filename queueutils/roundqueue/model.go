@@ -7,8 +7,8 @@ import (
 )
 
 type RoundQueue struct {
-	mu         sync.Mutex
-	pointer    *queueutils.Block
-	actualSize int
-	maxSize    int
+	mu      sync.Mutex
+	pointer *queueutils.Block
+	size    int
+	maxSize int
 }
